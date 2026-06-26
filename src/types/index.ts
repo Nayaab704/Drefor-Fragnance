@@ -15,9 +15,12 @@ export type Collection = {
   accent: "gold" | "rose" | "sage" | "ivory";
 };
 
+export type ProductCategory = "Oud" | "Amber" | "Floral" | "Fresh" | "Musk";
+
 export type ProductPreview = {
   name: string;
   slug: string;
+  category: ProductCategory;
   collection: string;
   price: string;
   volume: string;
@@ -52,6 +55,12 @@ export type SiteConfig = {
   };
   collections: Collection[];
   bestSellers: ProductPreview[];
+  shopFilters: Array<"All" | ProductCategory>;
+  shopSortOptions: Array<{
+    label: string;
+    value: "featured" | "price-asc" | "price-desc";
+  }>;
+  shopProducts: ProductPreview[];
   brandStory: {
     eyebrow: string;
     title: string;
