@@ -1,22 +1,32 @@
+"use client";
+
 import Image from "next/image";
 import { Mail, Sparkles } from "lucide-react";
+import { motion, useReducedMotion } from "framer-motion";
 
 import { siteConfig } from "@/config/site";
+import { fadeUp, viewportReveal } from "@/lib/animations";
 
 export function Footer() {
+  const shouldReduceMotion = Boolean(useReducedMotion());
   const contactLink = siteConfig.footer.linkGroups
     .flatMap((group) => group.links)
     .find((link) => link.href.startsWith("mailto:"));
 
   return (
-    <footer
+    <motion.footer
       id="contact"
-      className="border-t border-champagne/10 bg-black text-ivory"
+      initial="hidden"
+      whileInView="visible"
+      viewport={viewportReveal}
+      variants={fadeUp(shouldReduceMotion, 18)}
+      className="relative border-t border-champagne/10 bg-black text-ivory"
     >
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-champagne/35 to-transparent" />
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-[1.15fr_0.85fr] lg:px-8 lg:py-16">
         <div className="max-w-2xl">
           <div className="flex items-center gap-4">
-            <div className="relative h-14 w-14 overflow-hidden rounded-full bg-obsidian">
+            <div className="relative h-14 w-14 overflow-hidden rounded-full bg-obsidian shadow-[0_18px_45px_rgba(216,181,109,0.12)] transition duration-300 hover:shadow-[0_18px_55px_rgba(216,181,109,0.2)]">
               <Image
                 src={siteConfig.assets.logo}
                 alt=""
@@ -64,7 +74,7 @@ export function Footer() {
                   <li key={`${group.title}-${link.href}`}>
                     <a
                       href={link.href}
-                      className="text-sm text-ivory/65 transition hover:text-champagne focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-champagne"
+                      className="text-sm text-ivory/65 transition duration-300 hover:text-champagne focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-champagne"
                       aria-label={link.ariaLabel}
                     >
                       {link.label}
@@ -85,7 +95,7 @@ export function Footer() {
               <a
                 key={link.label}
                 href={link.href}
-                className="transition hover:text-champagne focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-champagne"
+                className="transition duration-300 hover:text-champagne focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-champagne"
               >
                 {link.label}
               </a>
@@ -93,6 +103,6 @@ export function Footer() {
           </div>
         </div>
       </div>
-    </footer>
+    </motion.footer>
   );
 }

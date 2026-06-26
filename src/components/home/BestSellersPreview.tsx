@@ -1,26 +1,29 @@
 "use client";
 
 import { ArrowRight, BottleWine, Sparkles } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 
 import { siteConfig } from "@/config/site";
 import { Button } from "@/components/ui/Button";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { fadeUp, staggerContainer, viewportReveal } from "@/lib/animations";
 import type { ProductPreview } from "@/types";
 
 export function BestSellersPreview() {
+  const shouldReduceMotion = Boolean(useReducedMotion());
+
   return (
     <section
       id="best-sellers"
-      className="relative overflow-hidden bg-ivory px-4 py-16 text-obsidian sm:px-6 lg:px-8 lg:py-24"
+      className="relative overflow-hidden bg-ivory px-4 py-[4.5rem] text-obsidian sm:px-6 lg:px-8 lg:py-28"
     >
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-obsidian/20 to-transparent" />
       <div className="mx-auto max-w-7xl">
         <motion.div
-          initial={{ opacity: 0, y: 18 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.55, ease: "easeOut" }}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportReveal}
+          variants={fadeUp(shouldReduceMotion)}
         >
           <SectionHeading
             eyebrow="Best Sellers"
@@ -30,11 +33,21 @@ export function BestSellersPreview() {
           />
         </motion.div>
 
-        <div className="mt-10 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-          {siteConfig.bestSellers.map((product, index) => (
-            <ProductCard index={index} key={product.slug} product={product} />
+        <motion.div
+          className="mt-12 grid gap-5 sm:grid-cols-2 xl:grid-cols-4"
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportReveal}
+          variants={staggerContainer(shouldReduceMotion)}
+        >
+          {siteConfig.bestSellers.map((product) => (
+            <ProductCard
+              key={product.slug}
+              product={product}
+              reducedMotion={shouldReduceMotion}
+            />
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );
@@ -42,21 +55,19 @@ export function BestSellersPreview() {
 
 function ProductCard({
   product,
-  index,
+  reducedMotion,
 }: {
   product: ProductPreview;
-  index: number;
+  reducedMotion: boolean;
 }) {
   return (
     <motion.article
-      initial={{ opacity: 0, y: 18 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.5, delay: index * 0.06, ease: "easeOut" }}
-      className="group flex min-h-[560px] flex-col overflow-hidden rounded-lg border border-obsidian/10 bg-white shadow-[0_24px_80px_rgba(5,4,3,0.08)] transition duration-300 hover:-translate-y-1 hover:border-champagne/60 hover:shadow-[0_30px_100px_rgba(5,4,3,0.14)]"
+      variants={fadeUp(reducedMotion, 26)}
+      className="group relative flex min-h-[560px] flex-col overflow-hidden rounded-lg border border-obsidian/10 bg-white shadow-[0_24px_80px_rgba(5,4,3,0.08)] transition duration-500 before:pointer-events-none before:absolute before:inset-y-0 before:left-0 before:w-px before:bg-champagne before:opacity-0 before:transition before:duration-500 before:content-[''] hover:-translate-y-1 hover:border-champagne/65 hover:shadow-[0_34px_110px_rgba(5,4,3,0.16)] hover:before:opacity-100"
     >
       <div className="relative flex h-56 items-center justify-center overflow-hidden bg-obsidian">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(216,181,109,0.26),transparent_36%),linear-gradient(145deg,rgba(216,181,109,0.12),rgba(5,4,3,0.8))]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(216,181,109,0.26),transparent_36%),linear-gradient(145deg,rgba(216,181,109,0.12),rgba(5,4,3,0.8))] transition duration-700 group-hover:scale-105 group-hover:opacity-95" />
+        <div className="absolute inset-0 translate-x-[-70%] bg-[linear-gradient(110deg,transparent,rgba(248,240,223,0.14),transparent)] opacity-0 transition duration-700 group-hover:translate-x-[70%] group-hover:opacity-100" />
         <div className="absolute inset-x-8 top-8 h-px bg-gradient-to-r from-transparent via-champagne/55 to-transparent" />
         <div className="absolute bottom-0 h-16 w-36 rounded-[50%] bg-black/45 blur-xl" />
         <div className="relative flex h-40 w-24 items-center justify-center transition duration-300 group-hover:scale-[1.03]">
@@ -105,11 +116,14 @@ function ProductCard({
             href={product.href}
             variant="ghost"
             size="sm"
-            className="border border-obsidian/15 bg-obsidian text-ivory hover:border-champagne hover:bg-obsidian hover:text-champagne"
+            className="group/cta translate-y-1 border border-obsidian/15 bg-obsidian text-ivory opacity-90 transition-all duration-300 hover:border-champagne hover:bg-obsidian hover:text-champagne group-hover:translate-y-0 group-hover:opacity-100"
             aria-label={`View details for ${product.name}`}
           >
             View Details
-            <ArrowRight aria-hidden="true" className="h-4 w-4" />
+            <ArrowRight
+              aria-hidden="true"
+              className="h-4 w-4 transition-transform duration-300 group-hover/cta:translate-x-1"
+            />
           </Button>
         </div>
       </div>

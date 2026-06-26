@@ -3,11 +3,12 @@
 import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
 import { ArrowRight, Flame, Flower2, Gem, Waves } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 
 import { siteConfig } from "@/config/site";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { cn } from "@/lib/utils";
+import { fadeUp, staggerContainer, viewportReveal } from "@/lib/animations";
 import type { Collection } from "@/types";
 
 const collectionIcons: Record<Collection["slug"], LucideIcon> = {
@@ -25,18 +26,20 @@ const accentClasses: Record<Collection["accent"], string> = {
 };
 
 export function FeaturedCollections() {
+  const shouldReduceMotion = Boolean(useReducedMotion());
+
   return (
     <section
       id="collections"
-      className="relative overflow-hidden bg-obsidian px-4 py-16 sm:px-6 lg:px-8 lg:py-24"
+      className="relative overflow-hidden bg-obsidian px-4 py-[4.5rem] sm:px-6 lg:px-8 lg:py-28"
     >
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-champagne/35 to-transparent" />
       <div className="mx-auto max-w-7xl">
         <motion.div
-          initial={{ opacity: 0, y: 18 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.55, ease: "easeOut" }}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportReveal}
+          variants={fadeUp(shouldReduceMotion)}
         >
           <SectionHeading
             eyebrow="Featured Collections"
@@ -45,15 +48,22 @@ export function FeaturedCollections() {
           />
         </motion.div>
 
-        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <motion.div
+          className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportReveal}
+          variants={staggerContainer(shouldReduceMotion)}
+        >
           {siteConfig.collections.map((collection, index) => (
             <CollectionCard
               collection={collection}
               index={index}
               key={collection.slug}
+              reducedMotion={shouldReduceMotion}
             />
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );
@@ -62,23 +72,23 @@ export function FeaturedCollections() {
 function CollectionCard({
   collection,
   index,
+  reducedMotion,
 }: {
   collection: Collection;
   index: number;
+  reducedMotion: boolean;
 }) {
   const Icon = collectionIcons[collection.slug];
 
   return (
     <motion.article
-      initial={{ opacity: 0, y: 18 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.5, delay: index * 0.06, ease: "easeOut" }}
-      className="group relative flex min-h-[350px] flex-col justify-between overflow-hidden rounded-lg border border-champagne/12 bg-[linear-gradient(145deg,rgba(248,240,223,0.07),rgba(248,240,223,0.025))] p-6 transition duration-300 hover:-translate-y-1 hover:border-champagne/45 hover:bg-ivory/[0.06] hover:shadow-[0_28px_90px_rgba(0,0,0,0.24)]"
+      variants={fadeUp(reducedMotion, 26)}
+      className="group relative flex min-h-[360px] flex-col justify-between overflow-hidden rounded-lg border border-champagne/12 bg-[linear-gradient(145deg,rgba(248,240,223,0.07),rgba(248,240,223,0.025))] p-6 transition duration-500 before:pointer-events-none before:absolute before:inset-0 before:-translate-x-full before:bg-[linear-gradient(115deg,transparent,rgba(216,181,109,0.12),transparent)] before:opacity-0 before:transition before:duration-700 before:content-[''] hover:-translate-y-1 hover:border-champagne/55 hover:bg-ivory/[0.06] hover:shadow-[0_30px_90px_rgba(216,181,109,0.14)] hover:before:translate-x-full hover:before:opacity-100"
     >
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(216,181,109,0.10),transparent_40%,rgba(248,240,223,0.05))] opacity-45 transition duration-700 group-hover:translate-x-2 group-hover:scale-[1.03] group-hover:opacity-80" />
       <div className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-champagne/45 to-transparent opacity-0 transition group-hover:opacity-100" />
 
-      <div>
+      <div className="relative">
         <div className="flex items-start justify-between gap-4">
           <div
             className={cn(
@@ -104,11 +114,14 @@ function CollectionCard({
 
       <Link
         href={collection.href}
-        className="mt-8 inline-flex items-center gap-2 text-sm font-medium text-champagne transition group-hover:gap-3 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-champagne"
+        className="relative mt-8 inline-flex items-center gap-2 text-sm font-medium text-champagne transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-champagne"
         aria-label={`Explore ${collection.name} fragrances`}
       >
         {collection.note}
-        <ArrowRight aria-hidden="true" className="h-4 w-4" />
+        <ArrowRight
+          aria-hidden="true"
+          className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1"
+        />
       </Link>
     </motion.article>
   );
